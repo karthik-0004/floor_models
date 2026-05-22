@@ -15,9 +15,6 @@ export default function Home() {
           <Layers className="w-5 h-5 text-[var(--primary)]" />
           <span className="font-bold text-[var(--text-primary)] tracking-tight">FloorPlan AI</span>
         </div>
-        <div className="px-3 py-1 bg-[var(--primary-light)] rounded-full border border-[var(--border-blue)]">
-          <span className="text-xs font-semibold text-[var(--primary)]">gpt-image-2</span>
-        </div>
       </nav>
 
       {/* Main Content Area */}
