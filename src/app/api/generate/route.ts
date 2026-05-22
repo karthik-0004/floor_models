@@ -8,6 +8,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "dummy",
 });
 
+const IMAGE_MODEL = process.env.IMAGE_MODEL || "gpt-image-2";
+
 function base64ToBuffer(base64: string): Buffer {
   const raw = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
   return Buffer.from(raw, 'base64');
@@ -132,7 +134,7 @@ export async function POST(req: NextRequest) {
     ].join('\n');
 
     const response = await openai.images.edit({
-      model: 'gpt-image-2',
+      model: IMAGE_MODEL,
       image: images,
       prompt: prompt + (instructions ? `\n\nAdditional instructions: ${instructions}` : ""),
       quality: 'high',
