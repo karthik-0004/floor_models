@@ -3,7 +3,6 @@ import { create } from 'zustand';
 interface FloorPlanState {
   originalImage: string | null;
   generatedImage: string | null;
-  description: string | null;
   isGenerating: boolean;
   progress: number;
   statusText: string;
@@ -13,7 +12,6 @@ interface FloorPlanState {
   enhanceLabels: boolean;
   setOriginalImage: (image: string | null) => void;
   setGeneratedImage: (image: string | null) => void;
-  setDescription: (description: string | null) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setProgress: (progress: number | ((prev: number) => number)) => void;
   setStatusText: (statusText: string) => void;
@@ -27,7 +25,6 @@ interface FloorPlanState {
 export const useFloorPlanStore = create<FloorPlanState>((set) => ({
   originalImage: null,
   generatedImage: null,
-  description: null,
   isGenerating: false,
   progress: 0,
   statusText: '',
@@ -37,7 +34,6 @@ export const useFloorPlanStore = create<FloorPlanState>((set) => ({
   enhanceLabels: true,
   setOriginalImage: (image) => set({ originalImage: image }),
   setGeneratedImage: (image) => set({ generatedImage: image }),
-  setDescription: (description) => set({ description }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setProgress: (progress) => set((state) => ({ progress: typeof progress === 'function' ? progress(state.progress) : progress })),
   setStatusText: (statusText) => set({ statusText }),
@@ -48,7 +44,6 @@ export const useFloorPlanStore = create<FloorPlanState>((set) => ({
   reset: () => set({
     originalImage: null,
     generatedImage: null,
-    description: null,
     isGenerating: false,
     progress: 0,
     statusText: '',
