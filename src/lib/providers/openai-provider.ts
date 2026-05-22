@@ -22,7 +22,7 @@ export async function generateFloorPlanImage(
     model,
     image: floorPlanFile,
     prompt,
-    quality: 'high',
+    quality: 'low',
     n: 1,
     output_format: 'png',
   });

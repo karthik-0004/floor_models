@@ -234,7 +234,7 @@ export function FloorPlanRegenerator() {
               className="h-12 px-8 rounded-[12px] bg-[var(--primary)] hover:bg-[#1f6ced] text-white font-bold transition-all shadow-[0_4px_20px_rgba(43,127,255,0.4)] hover:scale-[1.02] text-[15px]"
             >
               <Download className="w-5 h-5 mr-2" />
-              Save High-Res PNG
+              Download
             </Button>
             <Button 
               variant="outline" 
@@ -242,7 +242,7 @@ export function FloorPlanRegenerator() {
               className="h-12 px-8 rounded-[12px] border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white font-bold transition-all text-[15px]"
             >
               <RefreshCcw className="w-5 h-5 mr-2" />
-              Start New Project
+              Upload new Image
             </Button>
           </>
         )}
