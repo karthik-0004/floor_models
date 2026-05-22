@@ -82,7 +82,8 @@ export function FloorPlanRegenerator() {
       setProgress(100);
       setStatusText('Complete!');
       setGeneratedImage(data.results.imageUrl);
-      toast.success('Floor plan regenerated successfully!');
+      const modelTag = data.model ? ` (${data.model})` : '';
+toast.success(`Generated via ${data.provider || "AI"}${modelTag}`);
       
     } catch (error: any) {
       console.error(error);
