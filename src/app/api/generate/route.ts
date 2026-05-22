@@ -94,7 +94,7 @@ async function generateStyledFloorPlan(
   );
 
   const imageResponse = await openai.images.generate({
-    model: "gpt-image-1",
+    model: "gpt-image-2",
     prompt: generationPrompt,
     size: "1536x1024",
     quality: "high",
