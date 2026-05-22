@@ -3,8 +3,7 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UploadCloud, FileImage, FileText, X, Loader2, AlertCircle } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { UploadCloud, X, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -42,12 +41,11 @@ export function ImageUpload({ onUploadComplete, disabled = false }: ImageUploadP
     const selectedFile = acceptedFiles[0];
     setFile(selectedFile);
     
-    // Create object URL for instant preview (if image)
     if (selectedFile.type.startsWith('image/')) {
       const objectUrl = URL.createObjectURL(selectedFile);
       setPreview(objectUrl);
     } else if (selectedFile.type === 'application/pdf') {
-      setPreview('pdf'); // Special marker for PDF
+      setPreview('pdf');
     }
 
     simulateUpload(selectedFile);
@@ -67,7 +65,6 @@ export function ImageUpload({ onUploadComplete, disabled = false }: ImageUploadP
       });
     }, 200);
 
-    // Read as Base64 in parallel for the actual app to use
     const reader = new FileReader();
     reader.onload = (e) => {
       setTimeout(() => {
@@ -77,7 +74,7 @@ export function ImageUpload({ onUploadComplete, disabled = false }: ImageUploadP
           setIsUploading(false);
           onUploadComplete(e.target?.result as string);
         }, 500);
-      }, 1500); // minimum 1.5s visual feedback
+      }, 1500);
     };
     reader.onerror = () => {
       clearInterval(interval);
@@ -107,115 +104,104 @@ export function ImageUpload({ onUploadComplete, disabled = false }: ImageUploadP
       'application/pdf': ['.pdf']
     },
     maxFiles: 1,
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 10 * 1024 * 1024,
     disabled: disabled || isUploading
   });
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-4">
+    <div className="w-full">
       <div
         {...getRootProps()}
         className={cn(
-          "relative group overflow-hidden flex flex-col items-center justify-center w-full min-h-[350px]",
-          "rounded-3xl border-2 border-dashed transition-all duration-300 ease-out",
+          "relative group overflow-hidden flex flex-col items-center justify-center w-full min-h-[280px]",
+          "rounded-[16px] transition-all duration-200 ease-out",
+          error ? "border border-[#FCA5A5] bg-[#FFF1F1]" :
           isDragActive 
-            ? "border-purple-500 bg-purple-50/50 dark:bg-purple-900/10 scale-[1.02]" 
-            : "border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-black/20 hover:border-purple-400 hover:bg-purple-50/30 dark:hover:bg-purple-900/10 backdrop-blur-xl",
-          (disabled || isUploading) && "pointer-events-none opacity-80"
+            ? "border-2 border-dashed border-[var(--primary)] bg-[#e1edff] scale-[1.01]" 
+            : "border-2 border-dashed border-[var(--border-blue)] bg-[var(--primary-light)] hover:border-[var(--primary)]",
+          (disabled || isUploading) && "pointer-events-none"
         )}
       >
         <input {...getInputProps()} />
-        
-        {/* Glow effect on drag */}
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 transition-opacity duration-300 blur-2xl",
-          isDragActive ? "opacity-100" : "opacity-0 group-hover:opacity-50"
-        )} />
 
         <AnimatePresence mode="wait">
           {!file && (
             <motion.div
               key="upload-prompt"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="z-10 flex flex-col items-center p-6 text-center space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center text-center"
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-purple-500 blur-xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity" />
-                <div className="relative p-5 bg-white dark:bg-slate-900 rounded-full shadow-xl shadow-purple-500/10 border border-slate-100 dark:border-slate-800 text-purple-600 dark:text-purple-400 group-hover:-translate-y-1 transition-transform duration-300">
-                  <UploadCloud className="w-10 h-10" />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                  Upload your floor plan
-                </h3>
-                <p className="text-muted-foreground max-w-sm mx-auto">
-                  Drag & drop your file here, or click to browse your computer.
-                </p>
-              </div>
+              <UploadCloud 
+                className={cn(
+                  "w-[48px] h-[48px] text-[var(--primary)] mb-4 transition-transform",
+                  isDragActive && "animate-pulse scale-110"
+                )} 
+              />
+              <h3 className="text-[18px] font-bold text-[var(--text-primary)] mb-1">
+                Drop your floor plan here
+              </h3>
+              <p className="text-[14px] text-[var(--text-muted)] mb-6">
+                or click to browse
+              </p>
 
-              <div className="flex flex-wrap justify-center items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50">
-                  <FileImage className="w-3.5 h-3.5" />
-                  JPG, PNG, WEBP
-                </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50">
-                  <FileText className="w-3.5 h-3.5" />
-                  PDF
-                </span>
-                <span className="px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-800">
-                  Up to 10MB
-                </span>
+              <div className="flex gap-2 mb-2">
+                {['JPG', 'PNG', 'PDF'].map(ext => (
+                  <span key={ext} className="bg-white border border-[var(--border)] rounded-full px-3 py-1 text-[12px] text-[var(--text-secondary)] font-medium">
+                    {ext}
+                  </span>
+                ))}
               </div>
+              <span className="text-[12px] text-[var(--text-muted)]">
+                Up to 10MB
+              </span>
             </motion.div>
           )}
 
           {file && (
             <motion.div
               key="file-preview"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="z-10 w-full p-8 flex flex-col items-center justify-center space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full flex flex-col items-center justify-center p-6"
             >
-              <div className="relative group/preview w-full max-w-sm aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+              <div className="relative bg-white border border-[var(--border)] p-2 rounded-[12px] shadow-sm mb-3">
                 {preview === 'pdf' ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 space-y-3 bg-slate-50 dark:bg-slate-800/50">
-                    <FileText className="w-16 h-16 text-red-400" />
-                    <span className="font-medium text-slate-600 dark:text-slate-300">{file.name}</span>
+                  <div className="w-[200px] h-[150px] flex items-center justify-center bg-slate-50 rounded-lg">
+                    <span className="text-4xl">📄</span>
                   </div>
                 ) : (
-                  <img src={preview!} alt="Preview" className="w-full h-full object-cover" />
+                  <img 
+                    src={preview!} 
+                    alt="Preview" 
+                    className="max-h-[200px] rounded-lg object-contain" 
+                  />
                 )}
                 
-                {/* Remove Button */}
                 {!isUploading && (
                   <button
                     onClick={removeFile}
-                    className="absolute top-3 right-3 p-1.5 bg-black/50 hover:bg-red-500 text-white rounded-full backdrop-blur-md opacity-0 group-hover/preview:opacity-100 transition-all duration-200"
+                    className="absolute top-3 right-3 p-1 bg-white/80 backdrop-blur hover:bg-red-50 text-[var(--text-muted)] hover:text-red-500 rounded-md border border-[var(--border)] transition-colors shadow-sm"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 )}
-                
-                {/* Upload Overlay */}
-                {isUploading && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center space-y-4">
-                    <Loader2 className="w-8 h-8 text-white animate-spin" />
-                    <span className="text-white font-medium">{uploadProgress}%</span>
-                  </div>
-                )}
               </div>
 
+              <span className="text-[12px] text-[var(--text-muted)] truncate max-w-[200px] mb-3">
+                {file.name}
+              </span>
+
               {isUploading && (
-                <div className="w-full max-w-sm space-y-2">
-                  <Progress value={uploadProgress} className="h-2 w-full" />
-                  <p className="text-sm text-center text-slate-500 dark:text-slate-400 font-medium animate-pulse">
-                    Processing your floor plan...
-                  </p>
+                <div className="w-[200px] h-1 bg-[var(--border)] rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-[var(--primary)]"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${uploadProgress}%` }}
+                    transition={{ ease: "easeOut" }}
+                  />
                 </div>
               )}
             </motion.div>
@@ -224,14 +210,10 @@ export function ImageUpload({ onUploadComplete, disabled = false }: ImageUploadP
       </div>
 
       {error && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-xl"
-        >
+        <div className="mt-4 flex items-center justify-center gap-2 text-[#DC2626] text-sm">
           <AlertCircle className="w-4 h-4" />
-          {error}
-        </motion.div>
+          <span>{error}</span>
+        </div>
       )}
     </div>
   );
