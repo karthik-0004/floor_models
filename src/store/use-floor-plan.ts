@@ -1,55 +1,35 @@
 import { create } from 'zustand';
 
-interface FloorPlanState {
-  originalImage: string | null;
+export interface FloorPlanJob {
+  id: string;
+  fileName: string;
+  originalImage: string;
   generatedImage: string | null;
-  isGenerating: boolean;
+  status: 'pending' | 'processing' | 'completed' | 'error';
   progress: number;
   statusText: string;
-  style: string;
-  instructions: string;
-  preserveStructure: boolean;
-  enhanceLabels: boolean;
-  setOriginalImage: (image: string | null) => void;
-  setGeneratedImage: (image: string | null) => void;
-  setIsGenerating: (isGenerating: boolean) => void;
-  setProgress: (progress: number | ((prev: number) => number)) => void;
-  setStatusText: (statusText: string) => void;
-  setStyle: (style: string) => void;
-  setInstructions: (instructions: string) => void;
-  setPreserveStructure: (preserve: boolean) => void;
-  setEnhanceLabels: (enhance: boolean) => void;
+  error: string | null;
+  pageNumber?: number;
+}
+
+interface FloorPlanState {
+  jobs: FloorPlanJob[];
+  setJobs: (jobs: FloorPlanJob[]) => void;
+  updateJob: (id: string, updates: Partial<FloorPlanJob>) => void;
+  removeJob: (id: string) => void;
   reset: () => void;
 }
 
 export const useFloorPlanStore = create<FloorPlanState>((set) => ({
-  originalImage: null,
-  generatedImage: null,
-  isGenerating: false,
-  progress: 0,
-  statusText: '',
-  style: 'CAD Blueprint',
-  instructions: '',
-  preserveStructure: true,
-  enhanceLabels: true,
-  setOriginalImage: (image) => set({ originalImage: image }),
-  setGeneratedImage: (image) => set({ generatedImage: image }),
-  setIsGenerating: (isGenerating) => set({ isGenerating }),
-  setProgress: (progress) => set((state) => ({ progress: typeof progress === 'function' ? progress(state.progress) : progress })),
-  setStatusText: (statusText) => set({ statusText }),
-  setStyle: (style) => set({ style }),
-  setInstructions: (instructions) => set({ instructions }),
-  setPreserveStructure: (preserveStructure) => set({ preserveStructure }),
-  setEnhanceLabels: (enhanceLabels) => set({ enhanceLabels }),
-  reset: () => set({
-    originalImage: null,
-    generatedImage: null,
-    isGenerating: false,
-    progress: 0,
-    statusText: '',
-    style: 'CAD Blueprint',
-    instructions: '',
-    preserveStructure: true,
-    enhanceLabels: true,
-  })
+  jobs: [],
+  setJobs: (jobs) => set({ jobs }),
+  updateJob: (id, updates) => set((state) => ({
+    jobs: state.jobs.map((job) =>
+      job.id === id ? { ...job, ...updates } : job
+    ),
+  })),
+  removeJob: (id) => set((state) => ({
+    jobs: state.jobs.filter((job) => job.id !== id),
+  })),
+  reset: () => set({ jobs: [] }),
 }));
